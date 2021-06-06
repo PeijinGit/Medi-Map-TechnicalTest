@@ -1,4 +1,6 @@
 
+ USE [TechTestDb]
+
 IF OBJECT_ID('dbo.Patient') IS NOT NULL
 BEGIN
 	DROP TABLE dbo.Patient
@@ -27,6 +29,8 @@ CREATE TABLE dbo.Patient
 GO
 
 
+----------------Update uspMedicationAdministration---------------------------
+
 IF OBJECT_ID('dbo.MedicationAdministration') IS NOT NULL
 BEGIN
 	DROP TABLE dbo.MedicationAdministration
@@ -44,15 +48,15 @@ CREATE TABLE dbo.MedicationAdministration
 	MedicationAdministrationID int IDENTITY(1, 1) NOT NULL,
 	PatientID INT NOT NULL,
 	Created DATETIME NOT NULL,
-	BMI DECIMAL(3,1) NOT NULL
+	BMI DECIMAL(3,1) NOT NULL,
+	-- Add MedicationId Col
+	MedicationId INT NOT NULL
 	PRIMARY KEY CLUSTERED 
 	(
 		MedicationAdministrationID ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
-
-
- USE [TechTestDb]
+--------------------------------------------------------
 
 IF OBJECT_ID('dbo.Medication') IS NOT NULL
 BEGIN
@@ -101,6 +105,32 @@ CREATE TABLE dbo.ErrorLog
 ) ON [PRIMARY]
 GO
 
+
+----------Create SpecialAttention Table---------------
+
+IF OBJECT_ID('dbo.SpecialAttention') IS NOT NULL
+BEGIN
+	DROP TABLE dbo.SpecialAttention
+END
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE dbo.SpecialAttention
+(
+	SpecialAttentionID int IDENTITY(1, 1) NOT NULL,
+	PatientID int NOT NULL,
+	MedicationId int NOT NULL,
+	PRIMARY KEY CLUSTERED 
+	(
+		SpecialAttentionID ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+----------------End Create SpecialAttention Table-----------
 
 INSERT INTO [dbo].[Patient]
 VALUES
@@ -160,13 +190,46 @@ VALUES
            ,'Docusate sodium 50 mg + sennoside B 8 mg tablet'
 		   )  
 
+----------------- Insert  SpecialAttention Value-----------------
+INSERT INTO [dbo].[SpecialAttention]
+VALUES
+           (3
+           ,2)
+
 GO
+
 
 
 
 SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
 GO
+
+----------------- Function  CheckPatientExit-----------------
+
+CREATE FUNCTION CheckPatientExit (@PatientID int)
+RETURNS INT
+AS
+BEGIN
+	DECLARE @ex int = 0;
+	SELECT @ex=count(*) FROM dbo.Patietn pa WHERE pa.PatientID = @PatientId
+	RETURN @ex
+END
+go
+
+----------------- Function  CheckAttention-----------------
+
+CREATE FUNCTION CheckAttention (@PatientID int, @MedicationId int)
+RETURNS INT
+AS
+BEGIN
+	DECLARE @ex int = 0;
+	SELECT @ex=count(*) FROM dbo.SpecialAttention sa WHERE sa.PatientID = @PatientId AND sa.MedicationId = @MedicationId
+	RETURN @ex
+END
+go
+----------------- Create uspPatientManage Procedure----------------
+
 CREATE OR ALTER PROCEDURE dbo.uspPatientManage
 @PatientId INT = NULL,
 @FirstName NVARCHAR(40),
@@ -175,18 +238,22 @@ CREATE OR ALTER PROCEDURE dbo.uspPatientManage
 @DOB DATETIME,
 @HeightCms DECIMAL(4,1),
 @WeightKgs DECIMAL(4,1)
+
+
 AS 
 BEGIN
 
-
-	/*
-		This procedure receives data from the API tier that will insert a new patient record or update an existing patient record.
-	*/
-
+	IF dbo.CheckPatientExit(@PatientId) = 0
+	BEGIN
+	INSERT INTO Patient (PatientID,FirstName,LastName,Gender,DOB,HeightCms,WeightKgs) VALUES 
+	(@PatientId,@FirstName,@LastName,@Gender,@DOB,@HeightCms,@WeightKgs)
+	END
+	SELECT @@rowcount AS rowNum
+	
 END
 go
 
-
+----------------- Create uspMedicationAdministration Procedure----------------
 
 SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
@@ -197,29 +264,34 @@ CREATE OR ALTER PROCEDURE dbo.uspMedicationAdministration
 @BMI DECIMAL(3,1)
 AS 
 BEGIN
-
-
-	/*
-		This procedure receives data from the API tier that will insert a new Medication being administered to an existing patient.
-	*/
-
-
+	IF dbo.CheckAttention(@PatientId,@MedicationId) = 0
+	BEGIN
+		INSERT INTO dbo.MedicationAdministration(PatientID,Created,BMI,MedicationId) VALUES 
+		(@PatientId,CONVERT(varchar(10),GETDATE(),120),@BMI,@MedicationId)
+	END
+	SELECT @@rowcount AS rowNum
 END
 go
-CREATE or ALTER   PROCEDURE [dbo].[uspLogError]
-@ErrorLogId INT,
-@ErrorMessage INT
+
+----------------- Create uspLogError Procedure----------------
+CREATE or ALTER   PROCEDURE dbo.uspLogError
+--@ErrorLogId INT, Never used value
+@ErrorMessage varchar(4000)
 
 AS 
 BEGIN
-
-
-	/*
-		This procedure will insert an error message log.
-	*/
-
-
-
+	INSERT INTO dbo.ErrorLog values (@ErrorMessage)
 END
 go
+
+
+CREATE or ALTER   PROCEDURE dbo.checkPatient
+@PatientId int
+
+AS 
+BEGIN
+	SELECT @@ROWCOUNT as EXIST FROM dbo.Patient pa WHERE pa.PatientID = @PatientId
+END
+go
+
 
