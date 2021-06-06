@@ -9,7 +9,6 @@ namespace Business
     {
         public readonly IPatientDAL patientDAL;
         public readonly IErrorBLL errorBLL;
-        const int opRes = -1;
 
         public Patient(IPatientDAL patientDAL, IErrorBLL errorBLL)
         {
