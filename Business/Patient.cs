@@ -7,8 +7,8 @@ namespace Business
 {
     public class Patient : IPatientBLL
     {
-        public readonly IPatientDAL patientDAL;
-        public readonly IErrorBLL errorBLL;
+        private readonly IPatientDAL patientDAL;
+        private readonly IErrorBLL errorBLL;
 
         public Patient(IPatientDAL patientDAL, IErrorBLL errorBLL)
         {
@@ -46,7 +46,6 @@ namespace Business
 
         public decimal BMICalculate(decimal height, decimal weight)
         {
-
             if (height > 0 && weight > 0)
             {
                 decimal heigheM = height / 100;
@@ -59,7 +58,6 @@ namespace Business
                 errorBLL.RecordErrLog(inputExp.Message);
                 throw inputExp;
             }
-
         }
     }
 }

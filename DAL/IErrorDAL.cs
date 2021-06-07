@@ -6,6 +6,6 @@ namespace DAL
 {
     public interface IErrorDAL
     {
-        public void RecordErrLog(string msg);
+        void RecordErrLog(string msg);
     }
 }

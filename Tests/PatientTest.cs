@@ -11,14 +11,16 @@ namespace Tests
     public class PatientTest
     {
         [Fact]
-        public void BMITest_InputHeightAndWeight_ReturnBMI()
+        public void BMICalculate_InputHeightAndWeight_ReturnBMI()
         {
             //Arrange
             var iPatientDAL = new Mock<IPatientDAL>();
             var iErrorBLL = new Mock<IErrorBLL>();
             var patient = new Business.Patient(iPatientDAL.Object, iErrorBLL.Object);
+
             //Action
             var result = patient.BMICalculate(150, 60);
+
             //Assert
             Assert.Equal<decimal>(26.7m, result);
         }
@@ -29,12 +31,11 @@ namespace Tests
         [InlineData(0, 0)]
         [InlineData(-1, 0)]
         [InlineData(-1, -1)]
-        public void BMITest_InputInvalidValue_ReturnException(int height, int weight)
+        public void BMICalculate_InputInvalidValue_ThrowException(int height, int weight)
         {
             //Arrange
             var iPatientDAL = new Mock<IPatientDAL>();
             var iErrorBLL = new Mock<IErrorBLL>();
-            iErrorBLL.Setup(foo => foo.RecordErrLog(It.IsAny<string>()));
             var patient = new Business.Patient(iPatientDAL.Object, iErrorBLL.Object);
 
             //Action
@@ -78,20 +79,9 @@ namespace Tests
                 },
 
             };
-            Patients patient = new Patients()
-            {
-                PatientID = 2,
-                FirstName = "FirstName",
-                LastName = "LastName",
-                Gender = "Gender",
-                DOB = DateTime.Now,
-                HeightCms = 182,
-                WeightKgs = 65,
-                MedicationID = 1,
-                MedicationName = "Test Medication2"
-            };
             mock.Setup(foo => foo.AddPatient(It.IsAny<Patients>(), It.IsAny<Decimal>())).Returns(1);
             IPatientBLL patientBLL = new Business.Patient(mock.Object, mock2.Object);
+
             //Action
             int actual = patientBLL.AddPatient(testPatients);
 
@@ -101,25 +91,14 @@ namespace Tests
 
         [Theory]
         [InlineData(null)]
-        public void AddPatient_InputNullPatientList_ReturnAddedCount(List<Models.Patients> patients)
+        public void AddPatient_InputNullPatientList_ThrowException(List<Models.Patients> patients)
         {
             //Arrange
             var iPatientDALMock = new Mock<IPatientDAL>();
             var iErrorBLLMock = new Mock<IErrorBLL>();
-            Patients patient = new Patients()
-            {
-                PatientID = 2,
-                FirstName = "FirstName",
-                LastName = "LastName",
-                Gender = "Gender",
-                DOB = DateTime.Now,
-                HeightCms = 182,
-                WeightKgs = 65,
-                MedicationID = 1,
-                MedicationName = "Test Medication2"
-            };
             iPatientDALMock.Setup(foo => foo.AddPatient(It.IsAny<Patients>(), It.IsAny<Decimal>())).Returns(-1);
             iErrorBLLMock.Setup(foo => foo.RecordErrLog(It.IsAny<string>()));
+
             //Action
             IPatientBLL patientBLL = new Business.Patient(iPatientDALMock.Object, iErrorBLLMock.Object);
             Action act = () => patientBLL.AddPatient(patients);

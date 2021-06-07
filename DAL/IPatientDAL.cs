@@ -7,6 +7,5 @@ namespace DAL
     public interface IPatientDAL
     {
         int AddPatient(Patients patient, decimal bmi);
-
     }
 }

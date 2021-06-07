@@ -6,6 +6,6 @@ namespace Business
 {
     public interface IErrorBLL
     {
-        public void RecordErrLog(string msg);
+        void RecordErrLog(string msg);
     }
 }

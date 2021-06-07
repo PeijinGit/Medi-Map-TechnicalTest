@@ -9,9 +9,7 @@ namespace DAL
 {
     public class Patient : BaseDAL, IPatientDAL
     {
-        public Patient(IOptions<AppSettingModels> appSettings) : base(appSettings)
-        {
-        }
+        public Patient(IOptions<AppSettingModels> appSettings) : base(appSettings){ }
 
         public int AddPatient(Patients patient, decimal bmi)
         {
@@ -43,7 +41,6 @@ namespace DAL
             }
             return effectRow;
         }
-
     }
 }
 

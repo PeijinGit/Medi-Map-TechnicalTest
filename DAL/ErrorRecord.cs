@@ -9,9 +9,7 @@ namespace DAL
 {
     public class ErrorRecord : BaseDAL, IErrorDAL
     {
-        public ErrorRecord(IOptions<AppSettingModels> appSettings) : base(appSettings)
-        {
-        }
+        public ErrorRecord(IOptions<AppSettingModels> appSettings) : base(appSettings){}
 
         public void RecordErrLog(string msg)
         {

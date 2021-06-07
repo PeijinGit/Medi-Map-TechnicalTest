@@ -8,13 +8,13 @@ namespace DAL
 {
     public class BaseDAL
     {
-        private readonly IOptions<AppSettingModels> _appSettings;
+        private readonly IOptions<AppSettingModels> appSettings;
         protected string connectionString;
 
         public BaseDAL(IOptions<AppSettingModels> appSettings)
         {
-            _appSettings = appSettings;
-            connectionString = _appSettings.Value.ConStr;
+            this.appSettings = appSettings;
+            connectionString = this.appSettings.Value.ConStr;
         }
     }
 }

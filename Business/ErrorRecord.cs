@@ -7,7 +7,7 @@ namespace Business
 {
     public class ErrorRecord : IErrorBLL
     {
-        public readonly IErrorDAL errorDAL;
+        private readonly IErrorDAL errorDAL;
 
         public ErrorRecord(IErrorDAL errorDAL)
         {

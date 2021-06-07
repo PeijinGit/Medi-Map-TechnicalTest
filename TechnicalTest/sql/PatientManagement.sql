@@ -56,7 +56,8 @@ CREATE TABLE dbo.MedicationAdministration
 		MedicationAdministrationID ASC
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
---------------------------------------------------------
+----------------End Update uspMedicationAdministration-----------
+
 
 IF OBJECT_ID('dbo.Medication') IS NOT NULL
 BEGIN
@@ -198,9 +199,6 @@ VALUES
 
 GO
 
-
-
-
 SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
 GO
@@ -238,7 +236,6 @@ CREATE OR ALTER PROCEDURE dbo.uspPatientManage
 @DOB DATETIME,
 @HeightCms DECIMAL(4,1),
 @WeightKgs DECIMAL(4,1)
-
 
 AS 
 BEGIN

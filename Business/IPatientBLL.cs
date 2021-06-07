@@ -9,6 +9,5 @@ namespace Business
     {
         int AddPatient(List<Patients> patients);
         decimal BMICalculate(decimal height, decimal weight);
-
     }
 }
