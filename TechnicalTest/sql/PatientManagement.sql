@@ -212,7 +212,7 @@ RETURNS INT
 AS
 BEGIN
 	DECLARE @ex int = 0;
-	SELECT @ex=count(*) FROM dbo.Patietn pa WHERE pa.PatientID = @PatientId
+	SELECT @ex=count(*) FROM dbo.Patient pa WHERE pa.PatientID = @PatientId
 	RETURN @ex
 END
 go
